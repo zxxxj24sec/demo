@@ -1,12 +1,9 @@
 from flask import Flask, request, session   # 导入 Flask、请求对象、Session
+import pymysql, config                      # 导入数据库驱动和配置
 
 app = Flask(__name__)                       # 创建 Flask 应用
 
-app.secret_key = "test123"                 # Session 加密密钥
-
-USER = "admin"                             # 模拟用户名
-PASSWORD = "123456"                        # 模拟密码
-
+app.secret_key = "test1234"                 # Session 加密密钥
 
 @app.route("/")                            # 首页路由
 def index():
@@ -52,14 +49,34 @@ def login():
     username = request.args.get("username") # 获取 username 参数
     password = request.args.get("password") # 获取 password 参数
 
-    if username == USER and password == PASSWORD: # 验证账号密码
+    # 连接 MySQL 数据库
+    db = pymysql.connect(
+        host=config.MYSQL_HOST,
+        user=config.MYSQL_USER,
+        password=config.MYSQL_PASSWORD,
+        database=config.MYSQL_DATABASE
+    )
+    cursor = db.cursor()                    # 创建 SQL 执行对象
 
-        session["user"] = username         # 写入 Session 保存登录状态
+    # SQL 查询（使用字符串拼接，存在 SQL 注入风险，用于演示）
+    sql = f"SELECT * FROM users WHERE username='{username}' AND password='{password}'"
+    
+    print("执行的 SQL:", sql)               # 打印 SQL 到终端
+
+    cursor.execute(sql)                     # 执行 SQL
+    result = cursor.fetchone()              # 获取查询结果
+    db.close()                              # 关闭数据库连接
+
+    if result:                              # 验证账号密码
+        session["user"] = username          # 写入 Session 保存登录状态
 
         return f'''
-        <h1>login success</h1>             <!-- 登录成功提示 -->
+        <h1>登录成功！</h1>               <!-- 登录成功提示 -->
 
-        <h2>欢迎 {username}</h2>           <!-- 显示用户名 -->
+        <h2>欢迎 {username}</h2>          <!-- 显示用户名 -->
+
+        <p>执行的 SQL：</p>
+        <pre>{sql}</pre>
 
         <a href="/profile">                <!-- 跳转个人主页 -->
             <button>进入个人主页</button>
@@ -72,8 +89,13 @@ def login():
         </a>
         '''
 
-    return '''
-    <h1>login failed</h1>                  <!-- 登录失败提示 -->
+    return f'''
+    <h1>登录失败！</h1>                   <!-- 登录失败提示 -->
+
+    <p>用户名或密码错误</p>
+
+    <p>执行的 SQL：</p>
+    <pre>{sql}</pre>
 
     <a href="/">                           <!-- 返回首页 -->
         <button>重新登录</button>
@@ -117,4 +139,4 @@ def logout():
     '''
 
 
-app.run(debug=True, host='0.0.0.0')                        # 启动 Flask 调试模式
+app.run(debug=True, host='0.0.0.0')                        # 启动 Flask 调试模式这是最新的代码
