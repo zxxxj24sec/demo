@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>用户列表</title>
+</head>
+<body>
+    <h1>用户列表</h1>
+    
+    {% if success %}
+        <p style="color: green;">{{ message }}</p>
+    {% elif message %}
+        <p style="color: red;">{{ message }}</p>
+    {% endif %}
+    
+    {% if users %}
+        <table border="1">
+            <tr>
+                <th>ID</th>
+                <th>用户名</th>
+                {% if is_admin %}
+                    <th>密码</th>
+                    <th>权限</th>
+                    <th>操作</th>
+                {% endif %}
+            </tr>
+            {% for user in users %}
+            <tr>
+                <td>{{ user[0] }}</td>
+                <td>{{ user[1] }}</td>
+                {% if is_admin %}
+                    <td>{{ user[2] }}</td>
+                    <td>{{ "管理员" if user[3] == 1 else "普通用户" }}</td>
+                    <td>
+                        <a href="/user/{{ user[0] }}"><button>查看/编辑</button></a>
+                        <a href="/user/delete/{{ user[0] }}" onclick="return confirm('确定要删除吗？')"><button>删除</button></a>
+                    </td>
+                {% else %}
+                    {% if current_user == user[1] %}
+                        <td>
+                            <a href="/user/{{ user[0] }}"><button>查看我的详情</button></a>
+                        </td>
+                    {% endif %}
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </table>
+    {% elif not message %}
+        <p>暂无用户</p>
+    {% endif %}
+    
+    <br>
+    <a href="/profile"><button>返回个人主页</button></a>
+    <a href="/logout"><button>退出登录</button></a>
+</body>
+</html>

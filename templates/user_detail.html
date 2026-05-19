@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>用户详情</title>
+</head>
+<body>
+    <h1>用户详情</h1>
+    
+    {% if success and user %}
+        {% if is_admin %}
+            <!-- 管理员可以编辑用户 -->
+            <form action="/user/{{ user.id }}" method="post">
+                <label>用户名：</label>
+                <input type="text" name="username" value="{{ user.username }}" required>
+                <br><br>
+                <label>密码（留空则不修改）：</label>
+                <input type="password" name="password" placeholder="留空不修改">
+                <br><br>
+                <button type="submit">保存修改</button>
+            </form>
+        {% else %}
+            <!-- 普通用户只能查看自己的详情 -->
+            <p><strong>用户名：</strong>{{ user.username }}</p>
+            <p><strong>密码：</strong>{{ user.password }}</p>
+        {% endif %}
+        
+        {% if message %}
+            <p style="color: green;">{{ message }}</p>
+        {% endif %}
+        
+        <br>
+        <a href="/users"><button>返回用户列表</button></a>
+        <a href="/profile"><button>返回个人主页</button></a>
+    
+    {% elif not success %}
+        <p style="color: red;">{{ message }}</p>
+        <a href="/users"><button>返回用户列表</button></a>
+    {% endif %}
+</body>
+</html>

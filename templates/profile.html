@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>个人主页</title>
+</head>
+<body>
+    {% if logged_in %}
+        <h1>hello {{ username }}</h1>
+        {% if is_admin %}
+            <p style="color: blue;">当前身份：管理员</p>
+        {% else %}
+            <p style="color: gray;">当前身份：普通用户</p>
+        {% endif %}
+        <a href="/users"><button>用户管理</button></a>
+        <a href="/logout"><button>退出登录</button></a>
+    {% else %}
+        <h1>please login first</h1>
+        <a href="/"><button>返回首页</button></a>
+    {% endif %}
+</body>
+</html>
