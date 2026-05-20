@@ -2,17 +2,68 @@
 <html>
 <head>
     <title>个人主页</title>
+    <style>
+        .avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ccc;
+        }
+        .upload-form {
+            margin-top: 10px;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+    </style>
 </head>
 <body>
     {% if logged_in %}
         <h1>hello {{ username }}</h1>
+        
         {% if is_admin %}
             <p style="color: blue;">当前身份：管理员</p>
         {% else %}
             <p style="color: gray;">当前身份：普通用户</p>
         {% endif %}
-        <a href="/users"><button>用户管理</button></a>
-        <a href="/logout"><button>退出登录</button></a>
+        
+        <!-- 头像显示区域 -->
+        <div>
+            <h3>我的头像</h3>
+            {% if avatar %}
+                <img src="/static/avatars/{{ avatar }}" alt="头像" class="avatar">
+            {% else %}
+                <img src="https://via.placeholder.com/150" alt="默认头像" class="avatar">
+            {% endif %}
+            
+            <!-- 头像上传表单 -->
+            <form class="upload-form" action="/profile" method="post" enctype="multipart/form-data">
+                <input type="file" name="avatar" accept="image/*">
+                <button type="submit">上传头像</button>
+            </form>
+            
+            {% if error_message %}
+                <p class="error">{{ error_message }}</p>
+            {% endif %}
+        </div>
+        
+        <!-- 用户信息 -->
+        <div>
+            <h3>个人信息</h3>
+            <p><strong>用户名：</strong>{{ username }}</p>
+            <p><strong>性别：</strong>{{ gender if gender else '未设置' }}</p>
+            <p><strong>邮箱：</strong>{{ email if email else '未设置' }}</p>
+        </div>
+        
+        <!-- 操作按钮 -->
+        <div>
+            <a href="/users"><button>用户管理</button></a>
+            <a href="/logout"><button>退出登录</button></a>
+        </div>
     {% else %}
         <h1>please login first</h1>
         <a href="/"><button>返回首页</button></a>

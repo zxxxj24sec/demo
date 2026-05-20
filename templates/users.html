@@ -17,6 +17,8 @@
             <tr>
                 <th>ID</th>
                 <th>用户名</th>
+                <th>性别</th>
+                <th>邮箱</th>
                 {% if is_admin %}
                     <th>密码</th>
                     <th>权限</th>
@@ -25,19 +27,21 @@
             </tr>
             {% for user in users %}
             <tr>
-                <td>{{ user[0] }}</td>
-                <td>{{ user[1] }}</td>
+                <td>{{ user.id }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.gender if user.gender else '' }}</td>
+                <td>{{ user.email if user.email else '' }}</td>
                 {% if is_admin %}
-                    <td>{{ user[2] }}</td>
-                    <td>{{ "管理员" if user[3] == 1 else "普通用户" }}</td>
+                    <td>{{ user.password }}</td>
+                    <td>{{ "管理员" if user.is_admin == 1 else "普通用户" }}</td>
                     <td>
-                        <a href="/user/{{ user[0] }}"><button>查看/编辑</button></a>
-                        <a href="/user/delete/{{ user[0] }}" onclick="return confirm('确定要删除吗？')"><button>删除</button></a>
+                        <a href="/user/{{ user.id }}"><button>查看/编辑</button></a>
+                        <a href="/user/delete/{{ user.id }}" onclick="return confirm('确定要删除吗？')"><button>删除</button></a>
                     </td>
                 {% else %}
-                    {% if current_user == user[1] %}
+                    {% if current_user == user.username %}
                         <td>
-                            <a href="/user/{{ user[0] }}"><button>查看我的详情</button></a>
+                            <a href="/user/{{ user.id }}"><button>查看我的详情</button></a>
                         </td>
                     {% endif %}
                 {% endif %}

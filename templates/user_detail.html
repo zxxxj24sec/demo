@@ -16,12 +16,24 @@
                 <label>密码（留空则不修改）：</label>
                 <input type="password" name="password" placeholder="留空不修改">
                 <br><br>
+                <label>性别：</label>
+                <select name="gender">
+                    <option value="" {% if not user.gender %}selected{% endif %}>请选择</option>
+                    <option value="男" {% if user.gender == '男' %}selected{% endif %}>男</option>
+                    <option value="女" {% if user.gender == '女' %}selected{% endif %}>女</option>
+                </select>
+                <br><br>
+                <label>邮箱：</label>
+                <input type="email" name="email" value="{{ user.email }}">
+                <br><br>
                 <button type="submit">保存修改</button>
             </form>
         {% else %}
             <!-- 普通用户只能查看自己的详情 -->
             <p><strong>用户名：</strong>{{ user.username }}</p>
             <p><strong>密码：</strong>{{ user.password }}</p>
+            <p><strong>性别：</strong>{{ user.gender if user.gender else '未设置' }}</p>
+            <p><strong>邮箱：</strong>{{ user.email if user.email else '未设置' }}</p>
         {% endif %}
         
         {% if message %}
