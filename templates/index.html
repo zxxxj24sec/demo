@@ -4,17 +4,26 @@
     <title>Flask Login Demo</title>
 </head>
 <body>
-    <h1>Flask Login Demo</h1>
-    
-    <form action="/login" method="post">
+    <h1>学校管理系统</h1>
+
+    {% if session.get('user') %}
+        <p>欢迎，{{ session['user'] }}！</p>
+        <a href="/profile"><button>个人中心</button></a>
+        <a href="/announcements"><button>查看公告</button></a>
+        <a href="/announcement/create"><button>发布公告</button></a>
+        <a href="/logout"><button>退出登录</button></a>
+    {% else %}
+        <form action="/login" method="post">
         <input type="text" name="username" placeholder="请输入用户名" required>
         <br><br>
         <input type="password" name="password" placeholder="请输入密码" required>
         <br><br>
         <button type="submit">登录</button>
     </form>
-    
-    <br>
-    <a href="/register"><button>注册新用户</button></a>
+
+        <br>
+        <a href="/register"><button>注册新用户</button></a>
+        <a href="/announcements"><button>查看公告（无需登录）</button></a>
+    {% endif %}
 </body>
 </html>

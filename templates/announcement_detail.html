@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>公告详情 - 学校管理系统</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .nav {
+            margin: 15px 0;
+        }
+        .nav a {
+            margin-right: 15px;
+            text-decoration: none;
+            color: #0066cc;
+        }
+        .announcement {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .announcement h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        .announcement .meta {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .announcement .content {
+            line-height: 1.8;
+            color: #333;
+        }
+        .comments {
+            margin-top: 30px;
+        }
+        .comments h3 {
+            border-bottom: 2px solid #0066cc;
+            padding-bottom: 10px;
+        }
+        .comment {
+            border: 1px solid #eee;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .comment .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .comment .author {
+            font-weight: bold;
+            color: #0066cc;
+        }
+        .comment .time {
+            color: #999;
+            font-size: 12px;
+        }
+        .comment .content {
+            color: #333;
+        }
+        .comment-form {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .comment-form textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .error {
+            color: #ff0000;
+            padding: 10px;
+            background-color: #ffe6e6;
+            border: 1px solid #ff0000;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .actions {
+            margin-top: 10px;
+        }
+        .actions form {
+            display: inline;
+        }
+        .actions button {
+            background: none;
+            border: none;
+            color: #ff6600;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .actions button:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>学校公告</h1>
+        <div>
+            {% if session.get('user') %}
+                <span>欢迎，{{ session['user'] }}</span>
+                <a href="/logout">退出</a>
+            {% else %}
+                <a href="/">登录</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="nav">
+        <a href="/">首页</a>
+        {% if session.get('user') %}
+            <a href="/profile">个人中心</a>
+        {% endif %}
+        <a href="/announcements">公告列表</a>
+        {% if session.get('user') %}
+            <a href="/announcement/create">发布公告</a>
+        {% endif %}
+    </div>
+
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% else %}
+        <div class="announcement">
+            <h2>
+                {% if announcement.is_top %}
+                    <span style="background-color: #ff6600; color: white; padding: 2px 8px; border-radius: 3px; font-size: 14px; margin-right: 10px;">置顶</span>
+                {% endif %}
+                {{ announcement.title }}
+            </h2>
+            <div class="meta">
+                作者：{{ announcement.author_name }} |
+                发布时间：{{ announcement.created_at.strftime('%Y-%m-%d %H:%M') if announcement.created_at else '' }} |
+                浏览次数：{{ announcement.view_count }}
+                {% if session.get('is_admin') %}
+                    <div class="actions">
+                        <form action="/announcement/{{ announcement.id }}/delete" method="post" onsubmit="return confirm('确定要删除这篇公告吗？');">
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit">删除公告</button>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="content">
+                {{ announcement.content }}
+            </div>
+        </div>
+
+        <div class="comments">
+            <h3>评论 ({{ comments|length }})</h3>
+
+            {% if comments %}
+                {% for comment in comments %}
+                    <div class="comment">
+                        <div class="comment-header">
+                            <span class="author">{{ comment.username }}</span>
+                            <span class="time">{{ comment.created_at.strftime('%Y-%m-%d %H:%M') if comment.created_at else '' }}</span>
+                        </div>
+                        <div class="content">{{ comment.content }}</div>
+                        {% if session.get('user') and (session['user'] == comment.username or session.get('is_admin')) %}
+                            <div class="actions">
+                                        <form action="/announcement/{{ announcement.id }}/comment/{{ comment.id }}/delete" method="post" onsubmit="return confirm('确定要删除这条评论吗？');">
+                                    <button type="submit">删除</button>
+                                </form>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>暂无评论，快来抢沙发吧！</p>
+            {% endif %}
+
+            {% if session.get('user') %}
+                <div class="comment-form">
+                    <h4>发表评论</h4>
+                    <form action="/announcement/{{ announcement.id }}/comment" method="post">
+                        <textarea name="content" placeholder="请输入评论内容..." required></textarea>
+                        <button type="submit">发表评论</button>
+                    </form>
+                </div>
+            {% else %}
+                <p><a href="/">登录</a>后发表评论</p>
+            {% endif %}
+        </div>
+    {% endif %}
+</body>
+</html>

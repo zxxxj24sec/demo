@@ -21,10 +21,12 @@ def index():
 from routes.auth import register_auth_routes
 from routes.profile import register_profile_routes
 from routes.user import register_user_routes
+from routes.announcement import register_announcement_routes
 
 register_auth_routes(app)
 register_profile_routes(app)
 register_user_routes(app)
+register_announcement_routes(app)
 
 
 if __name__ == "__main__":
