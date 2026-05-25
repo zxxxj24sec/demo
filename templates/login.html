@@ -1,25 +1,69 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>登录结果</title>
-</head>
-<body>
-    {% if success %}
-        <h1>登录成功！</h1>
-        <h2>欢迎 {{ username }}</h2>
-        <a href="/profile"><button>进入个人主页</button></a>
-        <br><br>
-        <a href="/logout"><button>退出登录</button></a>
-    {% else %}
-        <h1>登录失败！</h1>
-        <p>{{ message }}</p>
-        <a href="/"><button>重新登录</button></a>
-    {% endif %}
-    
-    {% if sql %}
-        <br><br>
-        <p>执行的 SQL：</p>
-        <pre>{{ sql }}</pre>
-    {% endif %}
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}登录结果 - 学校管理系统{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-5 col-md-7">
+        <div class="card">
+            <div class="card-header bg-primary text-white text-center py-4">
+                <h3 class="mb-0"><i class="fas fa-graduation-cap me-2"></i>登录结果</h3>
+            </div>
+            <div class="card-body p-5 text-center">
+                {% if success %}
+                    <div class="mb-4">
+                        <i class="fas fa-check-circle fa-5x text-success"></i>
+                    </div>
+                    <h4 class="text-success mb-3">登录成功！</h4>
+                    <p class="text-muted">欢迎回来，<strong>{{ username }}</strong>！</p>
+
+                    {% if sql %}
+                        <div class="alert alert-warning mt-3 text-start">
+                            <small>
+                                <strong>调试信息（SQL注入演示）：</strong><br>
+                                <code>{{ sql }}</code>
+                            </small>
+                        </div>
+                    {% endif %}
+
+                    <div class="d-grid gap-2 mt-4">
+                        <a href="/profile" class="btn btn-primary">
+                            <i class="fas fa-user me-2"></i>进入个人中心
+                        </a>
+                        <a href="/announcements" class="btn btn-outline-primary">
+                            <i class="fas fa-bullhorn me-2"></i>查看公告
+                        </a>
+                        <a href="/logout" class="btn btn-outline-danger">
+                            <i class="fas fa-sign-out-alt me-2"></i>退出登录
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="mb-4">
+                        <i class="fas fa-times-circle fa-5x text-danger"></i>
+                    </div>
+                    <h4 class="text-danger mb-3">登录失败！</h4>
+                    <p class="text-muted">{{ message }}</p>
+
+                    {% if sql %}
+                        <div class="alert alert-warning mt-3 text-start">
+                            <small>
+                                <strong>调试信息（SQL注入演示）：</strong><br>
+                                <code>{{ sql }}</code>
+                            </small>
+                        </div>
+                    {% endif %}
+
+                    <div class="d-grid gap-2 mt-4">
+                        <a href="/" class="btn btn-primary">
+                            <i class="fas fa-redo me-2"></i>重新登录
+                        </a>
+                        <a href="/register" class="btn btn-outline-primary">
+                            <i class="fas fa-user-plus me-2"></i>注册新用户
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

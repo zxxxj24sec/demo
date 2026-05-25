@@ -1,152 +1,55 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>发布公告 - 学校管理系统</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #333;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-        .nav {
-            margin: 15px 0;
-        }
-        .nav a {
-            margin-right: 15px;
-            text-decoration: none;
-            color: #0066cc;
-        }
-        .form-container {
-            border: 1px solid #ddd;
-            padding: 25px;
-            border-radius: 5px;
-            background-color: #f9f9f9;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #333;
-        }
-        .form-group input[type="text"],
-        .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            box-sizing: border-box;
-            font-size: 14px;
-        }
-        .form-group textarea {
-            min-height: 200px;
-            resize: vertical;
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-        }
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #0066cc;
-        }
-        .btn-group {
-            display: flex;
-            gap: 10px;
-        }
-        button {
-            padding: 10px 25px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button[type="submit"] {
-            background-color: #0066cc;
-            color: white;
-        }
-        button[type="submit"]:hover {
-            background-color: #0052a3;
-        }
-        button[type="button"] {
-            background-color: #ddd;
-            color: #333;
-        }
-        button[type="button"]:hover {
-            background-color: #ccc;
-        }
-        .error {
-            color: #ff0000;
-            padding: 10px;
-            background-color: #ffe6e6;
-            border: 1px solid #ff0000;
-            border-radius: 5px;
-            margin-bottom: 15px;
-        }
-        .tips {
-            background-color: #e6f3ff;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            color: #0066cc;
-        }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1>学校管理系统</h1>
-        <div>
-            {% if session.get('user') %}
-                <span>欢迎，{{ session['user'] }}</span>
-                <a href="/logout">退出</a>
-            {% endif %}
+{% extends "base.html" %}
+
+{% block title %}发布公告 - 学校管理系统{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0"><i class="fas fa-edit me-2"></i>发布新公告</h3>
+            </div>
+            <div class="card-body">
+                {% if error %}
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>{{ error }}
+                    </div>
+                {% endif %}
+
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>温馨提示：</strong>请遵守学校相关规定，发布健康、正面的公告内容。
+                </div>
+
+                <form action="/announcement/create" method="post">
+                    <div class="mb-4">
+                        <label for="title" class="form-label">
+                            <i class="fas fa-heading me-2"></i>公告标题
+                        </label>
+                        <input type="text" class="form-control" id="title" name="title"
+                               placeholder="请输入公告标题" required maxlength="200">
+                        <div class="form-text">标题最多 200 个字符</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="content" class="form-label">
+                            <i class="fas fa-file-alt me-2"></i>公告内容
+                        </label>
+                        <textarea class="form-control" id="content" name="content" rows="10"
+                                  placeholder="请输入公告内容..." required></textarea>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-2"></i>发布公告
+                        </button>
+                        <a href="/announcements" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-2"></i>取消
+                        </a>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-
-    <div class="nav">
-        <a href="/">首页</a>
-        <a href="/profile">个人中心</a>
-        <a href="/announcements">公告列表</a>
-        <a href="/announcement/create"><strong>发布公告</strong></a>
-    </div>
-
-    <h2>发布新公告</h2>
-
-    {% if error %}
-        <div class="error">{{ error }}</div>
-    {% endif %}
-
-    <div class="tips">
-        <strong>温馨提示：</strong>请遵守学校相关规定，发布健康、正面的公告内容。
-    </div>
-
-    <div class="form-container">
-        <form action="/announcement/create" method="post">
-            <div class="form-group">
-                <label for="title">公告标题</label>
-                <input type="text" id="title" name="title" placeholder="请输入公告标题" required maxlength="200">
-            </div>
-
-            <div class="form-group">
-                <label for="content">公告内容</label>
-                <textarea id="content" name="content" placeholder="请输入公告内容..." required></textarea>
-            </div>
-
-            <div class="btn-group">
-                <button type="submit">发布公告</button>
-                <button type="button" onclick="history.back()">取消</button>
-            </div>
-        </form>
-    </div>
-</body>
-</html>
+</div>
+{% endblock %}

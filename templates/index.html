@@ -1,29 +1,91 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Flask Login Demo</title>
-</head>
-<body>
-    <h1>学校管理系统</h1>
+{% extends "base.html" %}
 
-    {% if session.get('user') %}
-        <p>欢迎，{{ session['user'] }}！</p>
-        <a href="/profile"><button>个人中心</button></a>
-        <a href="/announcements"><button>查看公告</button></a>
-        <a href="/announcement/create"><button>发布公告</button></a>
-        <a href="/logout"><button>退出登录</button></a>
-    {% else %}
-        <form action="/login" method="post">
-        <input type="text" name="username" placeholder="请输入用户名" required>
-        <br><br>
-        <input type="password" name="password" placeholder="请输入密码" required>
-        <br><br>
-        <button type="submit">登录</button>
-    </form>
+{% block title %}登录 - 学校管理系统{% endblock %}
 
-        <br>
-        <a href="/register"><button>注册新用户</button></a>
-        <a href="/announcements"><button>查看公告（无需登录）</button></a>
-    {% endif %}
-</body>
-</html>
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-5 col-md-7">
+        <div class="card">
+            <div class="card-header bg-primary text-white text-center py-4">
+                <h3 class="mb-0"><i class="fas fa-graduation-cap me-2"></i>学校管理系统</h3>
+            </div>
+            <div class="card-body p-4">
+                {% if success %}
+                    <div class="text-center">
+                        <div class="mb-4">
+                            <i class="fas fa-check-circle fa-5x text-success"></i>
+                        </div>
+                        <h4 class="text-success mb-3">登录成功！</h4>
+                        <p class="text-muted">欢迎回来，{{ username }}！</p>
+
+                        {% if sql %}
+                            <div class="alert alert-warning mt-3 text-start">
+                                <small>
+                                    <strong>调试信息（SQL注入演示）：</strong><br>
+                                    <code>{{ sql }}</code>
+                                </small>
+                            </div>
+                        {% endif %}
+
+                        <div class="d-grid gap-2 mt-4">
+                            <a href="/profile" class="btn btn-primary">
+                                <i class="fas fa-user me-2"></i>进入个人中心
+                            </a>
+                            <a href="/announcements" class="btn btn-outline-primary">
+                                <i class="fas fa-bullhorn me-2"></i>查看公告
+                            </a>
+                            <a href="/logout" class="btn btn-outline-danger">
+                                <i class="fas fa-sign-out-alt me-2"></i>退出登录
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    {% if message %}
+                        <div class="alert alert-danger" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>{{ message }}
+                        </div>
+                    {% endif %}
+
+                    <form action="/login" method="post">
+                        <div class="mb-4">
+                            <label for="username" class="form-label">
+                                <i class="fas fa-user me-2"></i>用户名
+                            </label>
+                            <input type="text" class="form-control" id="username" name="username"
+                                   placeholder="请输入用户名" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-lock me-2"></i>密码
+                            </label>
+                            <input type="password" class="form-control" id="password" name="password"
+                                   placeholder="请输入密码" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-2">
+                            <i class="fas fa-sign-in-alt me-2"></i>登录
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <p class="text-muted">还没有账号？</p>
+                        <a href="/register" class="btn btn-outline-primary">
+                            <i class="fas fa-user-plus me-2"></i>注册新用户
+                        </a>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="text-center">
+                        <small class="text-muted">
+                            <i class="fas fa-bullhorn me-1"></i>
+                            <a href="/announcements" class="text-decoration-none">查看公告（无需登录）</a>
+                        </small>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

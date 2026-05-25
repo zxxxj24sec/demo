@@ -1,52 +1,126 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>用户详情</title>
-</head>
-<body>
-    <h1>用户详情</h1>
-    
-    {% if success and user %}
-        {% if is_admin %}
-            <!-- 管理员可以编辑用户 -->
-            <form action="/user/{{ user.id }}" method="post">
-                <label>用户名：</label>
-                <input type="text" name="username" value="{{ user.username }}" required>
-                <br><br>
-                <label>密码（留空则不修改）：</label>
-                <input type="password" name="password" placeholder="留空不修改">
-                <br><br>
-                <label>性别：</label>
-                <select name="gender">
-                    <option value="" {% if not user.gender %}selected{% endif %}>请选择</option>
-                    <option value="男" {% if user.gender == '男' %}selected{% endif %}>男</option>
-                    <option value="女" {% if user.gender == '女' %}selected{% endif %}>女</option>
-                </select>
-                <br><br>
-                <label>邮箱：</label>
-                <input type="email" name="email" value="{{ user.email }}">
-                <br><br>
-                <button type="submit">保存修改</button>
-            </form>
-        {% else %}
-            <!-- 普通用户只能查看自己的详情 -->
-            <p><strong>用户名：</strong>{{ user.username }}</p>
-            <p><strong>密码：</strong>{{ user.password }}</p>
-            <p><strong>性别：</strong>{{ user.gender if user.gender else '未设置' }}</p>
-            <p><strong>邮箱：</strong>{{ user.email if user.email else '未设置' }}</p>
-        {% endif %}
-        
-        {% if message %}
-            <p style="color: green;">{{ message }}</p>
-        {% endif %}
-        
-        <br>
-        <a href="/users"><button>返回用户列表</button></a>
-        <a href="/profile"><button>返回个人主页</button></a>
-    
-    {% elif not success %}
-        <p style="color: red;">{{ message }}</p>
-        <a href="/users"><button>返回用户列表</button></a>
-    {% endif %}
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}用户详情 - 学校管理系统{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">
+                    <i class="fas fa-user me-2"></i>用户详情
+                </h4>
+                <a href="/users" class="btn btn-sm btn-light">
+                    <i class="fas fa-arrow-left me-2"></i>返回列表
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    {% if user.avatar %}
+                        <img src="/static/avatars/{{ user.avatar }}" alt="头像" class="rounded-circle shadow-lg" width="120" height="120" style="object-fit: cover;">
+                    {% else %}
+                        <img src="https://via.placeholder.com/120/667eea/ffffff?text=User" alt="默认头像" class="rounded-circle shadow-lg" width="120" height="120">
+                    {% endif %}
+                </div>
+
+                <table class="table table-borderless">
+                    <tbody>
+                        <tr>
+                            <th scope="row" width="35%">
+                                <i class="fas fa-id-badge me-2 text-primary"></i>用户ID
+                            </th>
+                            <td>{{ user.id }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">
+                                <i class="fas fa-user me-2 text-primary"></i>用户名
+                            </th>
+                            <td>{{ user.username }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">
+                                <i class="fas fa-lock me-2 text-primary"></i>密码
+                            </th>
+                            <td>
+                                <code>{{ user.password }}</code>
+                                <small class="text-muted ms-2">(显示明文密码)</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">
+                                <i class="fas fa-venus-mars me-2 text-primary"></i>性别
+                            </th>
+                            <td>{{ user.gender if user.gender else '<span class="text-muted">未设置</span>' }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">
+                                <i class="fas fa-envelope me-2 text-primary"></i>邮箱
+                            </th>
+                            <td>{{ user.email if user.email else '<span class="text-muted">未设置</span>' }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">
+                                <i class="fas fa-shield-alt me-2 text-primary"></i>账户类型
+                            </th>
+                            <td>
+                                {% if user.is_admin == 1 %}
+                                    <span class="badge bg-danger">管理员</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">普通用户</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <hr>
+
+                <h5 class="mb-3"><i class="fas fa-edit me-2"></i>编辑用户信息</h5>
+
+                {% if error %}
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
+                    </div>
+                {% endif %}
+
+                <form action="/user/{{ user.id }}" method="post">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="username" class="form-label">用户名</label>
+                            <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="password" class="form-label">密码（留空不修改）</label>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="请输入新密码">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="gender" class="form-label">性别</label>
+                            <select class="form-control" id="gender" name="gender">
+                                <option value="">请选择</option>
+                                <option value="男" {% if user.gender == '男' %}selected{% endif %}>男</option>
+                                <option value="女" {% if user.gender == '女' %}selected{% endif %}>女</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">邮箱</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ user.email if user.email else '' }}" placeholder="请输入邮箱">
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>保存修改
+                        </button>
+                        <a href="/users" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-2"></i>取消
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
